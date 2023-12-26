@@ -8,6 +8,7 @@ using System.Text;
 using UserService.Data;
 using UserService.Model;
 using UserService.Repository;
+using UserService.Service;
 
 namespace UserService.Controllers
 {
@@ -18,9 +19,11 @@ namespace UserService.Controllers
         private readonly IUserRepository _repository;
         private readonly AppSettings _appSettings;
 
+
         public UserController(IUserRepository repository, IOptionsMonitor<AppSettings> optionsMonitor) {
             _repository=repository;
             _appSettings = optionsMonitor.CurrentValue;
+
         }
         [HttpGet]
         public IActionResult GetAll()
@@ -95,7 +98,7 @@ namespace UserService.Controllers
         }
 
         [HttpPost("Login")]
-        public IActionResult Validate(UserLogin user)
+        public async Task<IActionResult> Validate(UserLogin user)
         {
             var us = _repository.Validate(user);
             if (us == null)
@@ -106,53 +109,24 @@ namespace UserService.Controllers
                     Message="Invalid Email or Passwork"
                 });
             }
-            User user1= new User
-            {
-                Id = us.Id,
-                Email = us.Email,
-                FirstName = us.FirstName,
-                LastName = us.LastName,
-                Password = us.Password,
-                Gender = us.Gender,
-                Phone = us.Phone,
-                DateOfBirth = us.DateOfBirth,
-                Avatar = us.Avatar,
-                IsFirstLogin = us.IsFirstLogin,
-                Address = us.Address,
-                IsActive = us.IsActive,
-                CreatedAt = us.CreatedAt,
-                UpdatedAt = us.UpdatedAt,
-            };
+            var token = await _repository.GenerateToken(us, _appSettings.SecretKey);
             return Ok(new
             {
                 Success = true,
                 Message = "Authenticate success",
-                Data=GenerateToken(user1),
-            });
+                Data = token
+            }) ;
         }
-
-        private string GenerateToken(User user)
+        [HttpPost("RefreshToken")]
+        public async Task<IActionResult> CreateToken(TokenModel model)
         {
-            var jwtToken = new JwtSecurityTokenHandler();
-            var secretKeyByte= Encoding.UTF8.GetBytes(_appSettings.SecretKey);
 
-            var tokenDescription = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim("Id", user.Id),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim("TokenId", Guid.NewGuid().ToString()),
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKeyByte),SecurityAlgorithms.HmacSha512Signature)
-                
-            };
 
-            var token=jwtToken.CreateToken(tokenDescription);
-            return jwtToken.WriteToken(token);
-
+            var token = await _repository.GenerateRefreshToken(model,_appSettings.SecretKey);
+            return Ok(token);
+           
         }
+        
     }
 
 }

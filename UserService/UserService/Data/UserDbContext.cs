@@ -15,7 +15,8 @@ namespace UserService.Data
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<UserPermission> UserPermissions { get; set; }
-
+        
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -41,7 +42,7 @@ namespace UserService.Data
                 .HasOne(p => p.Permission)
                 .WithMany(u => u.Permissions)
                 .HasForeignKey(r => r.PermissionId);
-
+           
 
 
         }

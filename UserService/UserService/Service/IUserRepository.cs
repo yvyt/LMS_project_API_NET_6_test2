@@ -1,4 +1,5 @@
-﻿using UserService.Model;
+﻿using UserService.Data;
+using UserService.Model;
 
 namespace UserService.Repository
 {
@@ -9,6 +10,8 @@ namespace UserService.Repository
         UserVM Add(UserVM user);
         void Update(UserVM user); 
         void Delete(string id);
-        UserVM Validate(UserLogin model);
+        User Validate(UserLogin model);
+        Task<TokenModel> GenerateToken(User u, string secretKey);
+        Task<string> GenerateRefreshToken(TokenModel model, string secretKey);
     }
 }

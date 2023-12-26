@@ -1,11 +1,14 @@
-﻿using UserService.Model;
+﻿using UserService.Data;
+using UserService.Model;
 
 namespace UserService.Service
 {
     public interface ISetUp
     {
-        void AddRoles();
-        void AddPermission();
+        RefreshToken Add(RefreshToken token);
+        void update(RefreshToken token);
+        RefreshToken getByToken(string token);
+        User getById(string id);
 
     }
 }
