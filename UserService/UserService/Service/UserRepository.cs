@@ -122,7 +122,32 @@ namespace UserService.Repository
             userEdit.Avatar=user.Avatar;
             _context.SaveChanges();
         }
-        
-    
+
+        public UserVM Validate(UserLogin model)
+        {
+            var user= _context.Users.SingleOrDefault(p=>p.Email==model.Email && p.Password==model.Password);
+            if (user != null)
+            {
+                UserVM u= new UserVM
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Password = user.Password,
+                    Gender = user.Gender,
+                    Phone = user.Phone,
+                    DateOfBirth = user.DateOfBirth,
+                    Avatar = user.Avatar,
+                    IsFirstLogin = user.IsFirstLogin,
+                    Address = user.Address,
+                    IsActive = user.IsActive,
+                    CreatedAt = user.CreatedAt,
+                    UpdatedAt = user.UpdatedAt,
+                };
+                return u;
+            }
+            return null;
+        }
     }
 }

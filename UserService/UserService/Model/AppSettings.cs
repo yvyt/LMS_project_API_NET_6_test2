@@ -2,6 +2,6 @@
 {
     public class AppSettings
     {
-        public string SecretKey;
+        public string SecretKey { get; set; }
     }
 }

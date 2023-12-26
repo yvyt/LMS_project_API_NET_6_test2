@@ -9,5 +9,6 @@ namespace UserService.Repository
         UserVM Add(UserVM user);
         void Update(UserVM user); 
         void Delete(string id);
+        UserVM Validate(UserLogin model);
     }
 }
